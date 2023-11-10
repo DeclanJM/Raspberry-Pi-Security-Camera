@@ -4,7 +4,9 @@ def tweet_text(text):
     client.create_tweet(text = text)
     print("Tweeted Text!")
 
-def upload_image(img_path):     ##Loads image into the api, does NOT post to twitter
+def upload_image(img_name):     ##Loads image into the api, does NOT post to twitter
+    img_path = "images/" + img_name
+    print(img_path)
     media_id = api.media_upload(filename = img_path).media_id_string
     print("Media ID: " + media_id)
     return media_id
@@ -22,4 +24,5 @@ if __name__ == "__main__":
     text = input("Enter text to tweet:  ")
     media = input("Enter the name of the image you would like to upload:  ")
 
+    tweet(text, media)
 
