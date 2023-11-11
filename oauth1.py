@@ -25,4 +25,3 @@ client.create_tweet(text = "HELLO WORLD!?")
 
 # for tweet in client.get_users_tweets(person).data:
 #     print(tweet.text)
-

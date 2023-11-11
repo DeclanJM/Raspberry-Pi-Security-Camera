@@ -6,7 +6,7 @@ import shutil
 import twitter_bot as tb
 
 
-def get_vid():
+def get_vid(thread_id, number_of_posts):
     cap = cv2.VideoCapture(0)
 
     face_cascade = cv2.CascadeClassifier(
@@ -17,7 +17,7 @@ def get_vid():
     detection = False
     detection_stopped_time = None
     timer_started = False
-    SECONDS_TO_RECORD_AFTER_DETECTION = 3
+    SECONDS_TO_RECORD_AFTER_DETECTION = 1
 
     frame_size = (int(cap.get(3)), int(cap.get(4)))
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
@@ -41,8 +41,7 @@ def get_vid():
                 detection = True
                 current_time = datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
                 filename = f"videos/{current_time}.mp4"
-                out = cv2.VideoWriter(
-                    filename, fourcc, 20, frame_size)
+                out = cv2.VideoWriter(filename, fourcc, 20, frame_size)
                 print("Started Recording!")
         elif detection:
             if timer_started:
@@ -52,7 +51,7 @@ def get_vid():
                     out.release()
                     cv2.destroyAllWindows()
                     run = False
-                    get_img(filename)
+                    get_img(filename, thread_id, number_of_posts)
                     print('Stopped Recording!')
             else:
                 timer_started = True
@@ -61,7 +60,7 @@ def get_vid():
         if detection:
             out.write(frame)
 
-        for (x, y, width, height) in faces:
+        for (x, y, width, height) in bodies:
             cv2.rectangle(frame, (x, y), (x + width, y + height), (255, 0, 0), 3)
 
         cv2.imshow("Camera", frame)
@@ -73,7 +72,7 @@ def get_vid():
     cap.release()
     cv2.destroyAllWindows()
 
-def get_img(filename):
+def get_img(filename, thread_id, number_of_posts):
     if not os.path.exists("vid_frames"):
         os.makedirs("vid_frames")
     
@@ -83,12 +82,13 @@ def get_img(filename):
     while True:
         success, frame = vid.read()
 
-        if success != True:
+        if success != True and currentFrame > 2:
             cv2.destroyAllWindows()
-            tb.tweet("Intruder Alert!", "vid_frames/" + str(int((currentFrame - 90)/2)) + ".jpg")
+            tb.tweet(thread_id, f"ALERT: Intruder #{number_of_posts}!", "vid_frames/" + str(int((currentFrame)/2)) + ".jpg")
             deleteAll()
             currentFrame = 0
             break
+
         cv2.imshow("Output", frame)
         cv2.imwrite("vid_frames/" + str(currentFrame) + ".jpg", frame)
         currentFrame += 1
