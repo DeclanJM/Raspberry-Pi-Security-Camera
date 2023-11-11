@@ -86,7 +86,7 @@ def get_img(filename):
         if success != True:
             cv2.destroyAllWindows()
             tb.tweet("Intruder Alert!", "vid_frames/" + str(int((currentFrame - 90)/2)) + ".jpg")
-            #deleteAll()
+            deleteAll()
             currentFrame = 0
             break
         cv2.imshow("Output", frame)
