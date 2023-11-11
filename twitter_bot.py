@@ -5,7 +5,7 @@ def tweet_text(text):
     print("Tweeted Text!")
 
 def upload_image(img_name):     ##Loads image into the api, does NOT post to twitter
-    img_path = "images/" + img_name
+    img_path = img_name
     print(img_path)
     media_id = api.media_upload(filename = img_path).media_id_string
     print("Media ID: " + media_id)
