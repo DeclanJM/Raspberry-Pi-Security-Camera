@@ -6,20 +6,26 @@ def tweet_text(text):
 
 def upload_image(img_name):     ##Loads image into the api, does NOT post to twitter
     img_path = img_name
-    print(img_path)
+    print("Media Path: " + img_path)
     media_id = api.media_upload(filename = img_path).media_id_string
     print("Media ID: " + media_id)
     return media_id
 
+def tweet(text, media):
+    media_id = upload_image(media)
+    client.create_tweet(text = text, media_ids = [media_id])
+    print("Successfully Tweeted!")
+
 def start_thread(text):    ##Tweets initial thread tweet and returns the ID
-    tweet = client.create_tweet(text = text)
-    tweet_id = tweet.id_str
-    print("Tweet Successfully Tweeted!\n\tThread ID: " + tweet_id)
-    return tweet_id
+    tweet_text = "Starting Thread!"
+    tweet = api.update_status(status = tweet_text)
+    print("Thread Successfully Started!")
+    return tweet.id
 
 def tweet_to_thread(thread_id, text, media): ##Tweets out the text along with the image/s uploaded to the thread
     media_id = upload_image(media)
     client.create_tweet(text = text, media_ids = [media_id], in_reply_to_tweet_id = thread_id)
+
 
 if __name__ == "__main__":
     text = input("Enter text to tweet:  ")

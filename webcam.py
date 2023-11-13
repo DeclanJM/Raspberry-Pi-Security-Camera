@@ -6,8 +6,8 @@ import shutil
 import twitter_bot as tb
 
 
-def get_vid(thread_id, number_of_posts):
-    cap = cv2.VideoCapture(0)
+def get_vid(number_of_posts):
+    cap = cv2.VideoCapture(0)   ##0 is default webcam: 5s startup, 1 is logi: 63s startup
 
     face_cascade = cv2.CascadeClassifier(
         cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
@@ -17,7 +17,7 @@ def get_vid(thread_id, number_of_posts):
     detection = False
     detection_stopped_time = None
     timer_started = False
-    SECONDS_TO_RECORD_AFTER_DETECTION = 1
+    SECONDS_TO_RECORD_AFTER_DETECTION = 3
 
     frame_size = (int(cap.get(3)), int(cap.get(4)))
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
@@ -51,8 +51,9 @@ def get_vid(thread_id, number_of_posts):
                     out.release()
                     cv2.destroyAllWindows()
                     run = False
-                    get_img(filename, thread_id, number_of_posts)
                     print('Stopped Recording!')
+                    get_img(filename, number_of_posts)
+                    deleteAll()
             else:
                 timer_started = True
                 detection_stopped_time = time.time()
@@ -60,8 +61,8 @@ def get_vid(thread_id, number_of_posts):
         if detection:
             out.write(frame)
 
-        for (x, y, width, height) in bodies:
-            cv2.rectangle(frame, (x, y), (x + width, y + height), (255, 0, 0), 3)
+        for (x, y, width, height) in faces:
+            cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 0, 255), 3)
 
         cv2.imshow("Camera", frame)
 
@@ -72,7 +73,7 @@ def get_vid(thread_id, number_of_posts):
     cap.release()
     cv2.destroyAllWindows()
 
-def get_img(filename, thread_id, number_of_posts):
+def get_img(filename, number_of_posts):
     if not os.path.exists("vid_frames"):
         os.makedirs("vid_frames")
     
@@ -84,12 +85,20 @@ def get_img(filename, thread_id, number_of_posts):
 
         if success != True and currentFrame > 2:
             cv2.destroyAllWindows()
-            tb.tweet(thread_id, f"ALERT: Intruder #{number_of_posts}!", "vid_frames/" + str(int((currentFrame)/2)) + ".jpg")
-            deleteAll()
+            tb.tweet(f"ALERT: Intruder #{number_of_posts}!", "vid_frames/" + str(int((currentFrame)/2)) + ".jpg")
             currentFrame = 0
             break
 
-        cv2.imshow("Output", frame)
+        face_cascade = cv2.CascadeClassifier(
+        cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+    
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+        
+        for (x, y, width, height) in faces:
+            cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 0, 255), 3)
+
+        cv2.imshow("Video Replay", frame)
         cv2.imwrite("vid_frames/" + str(currentFrame) + ".jpg", frame)
         currentFrame += 1
 
@@ -100,7 +109,7 @@ def get_img(filename, thread_id, number_of_posts):
     cv2.destroyAllWindows()
 
 def deleteAll():
-    vid_folder = "./videoss"
+    vid_folder = "./videos"
     vid_frames_folder = "./vid_frames"
     shutil.rmtree(vid_frames_folder, ignore_errors = True)
     shutil.rmtree(vid_folder, ignore_errors = True)
