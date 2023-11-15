@@ -1,34 +1,30 @@
 from oauth2 import client, api
 
-def tweet_text(text):
-    client.create_tweet(text = text)
-    print("Tweeted Text!")
-
-def upload_image(img_name):     ##Loads image into the api, does NOT post to twitter
-    img_path = img_name
-    print("Media Path: " + img_path)
+##Loads image into the api but does not post
+def load_image(img_path):
     media_id = api.media_upload(filename = img_path).media_id_string
-    print("Media ID: " + media_id)
     return media_id
 
-def tweet(text, media):
-    media_id = upload_image(media)
-    client.create_tweet(text = text, media_ids = [media_id])
-    print("Successfully Tweeted!")
+#Tweets text only
+def tweet_text(text):
+    client.create_tweet(text = text)
+    print("Tweeted: " + text)
 
-def start_thread(text):    ##Tweets initial thread tweet and returns the ID
-    tweet_text = "Starting Thread!"
-    tweet = api.update_status(status = tweet_text)
+##Tweets text and an image
+def tweet_text_and_media(text, media):
+    media_id = load_image(media)
+    client.create_tweet(text = text, media_ids = [media_id])
+    print(f"Successfully Tweeted:\n\n{text}\n\nMedia ID:  {media_id}\n")
+
+##Requires Basic API Account. Does not work with free version
+##Tweets initial thread tweet and returns the ID
+def start_thread(text): 
+    tweet = api.update_status(status = text)
     print("Thread Successfully Started!")
     return tweet.id
 
-def tweet_to_thread(thread_id, text, media): ##Tweets out the text along with the image/s uploaded to the thread
-    media_id = upload_image(media)
+##Requires Basic API Account. Does not work with free version
+##Tweets out the text along with the image/s uploaded to the thread
+def tweet_to_thread(thread_id, text, media): 
+    media_id = load_image(media)
     client.create_tweet(text = text, media_ids = [media_id], in_reply_to_tweet_id = thread_id)
-
-
-if __name__ == "__main__":
-    text = input("Enter text to tweet:  ")
-    media = input("Enter the name of the image you would like to upload:  ")
-
-    tweet(text, media)
