@@ -7,6 +7,7 @@ import twitter_bot as tb
 
 SECONDS_TO_RECORD_AFTER_DETECTION = 2
 CAMERA_ID = 0   ##0 is default webcam: 5s startup, 1 is logi: 63s startup
+VIDEO_REPLAY = False
 
 ##Webcam starts recording when it detects a face, then stops after a 3 second period of not seeing one, then calls the get_img function
 def get_vid(number_of_posts):
@@ -88,7 +89,7 @@ def get_img(filename, number_of_posts):
         os.makedirs("frames")
     
     vid = cv2.VideoCapture(filename)
-    global SECONDS_TO_RECORD_AFTER_DETECTION
+    global SECONDS_TO_RECORD_AFTER_DETECTION, VIDEO_REPLAY
     current_frame = 0
     remove_frame = SECONDS_TO_RECORD_AFTER_DETECTION * 20   #Number of frames after the face stopped being detected
 
@@ -111,8 +112,8 @@ def get_img(filename, number_of_posts):
         for (x, y, width, height) in faces:
             image = cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 0, 255), 3)
             cv2.putText(image, 'INTRUDER!', (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
-
-        cv2.imshow("Video Replay", frame)
+        if VIDEO_REPLAY:
+            cv2.imshow("Video Replay", frame)
         cv2.imwrite("frames/" + str(current_frame) + ".jpg", frame)
         current_frame += 1
 
@@ -204,7 +205,7 @@ def get_img_net(filename):
         os.makedirs("frames")
     
     vid = cv2.VideoCapture(filename)
-    global SECONDS_TO_RECORD_AFTER_DETECTION
+    global SECONDS_TO_RECORD_AFTER_DETECTION, VIDEO_REPLAY
     current_frame = 0
     remove_frame = SECONDS_TO_RECORD_AFTER_DETECTION * 20   #Number of frames after the face stopped being detected
 
@@ -222,8 +223,8 @@ def get_img_net(filename):
         for (x, y, width, height) in faces:
             image = cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 0, 255), 3)
             cv2.putText(image, 'INTRUDER!', (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
-
-        cv2.imshow("Video Replay", frame)
+        if VIDEO_REPLAY:
+            cv2.imshow("Video Replay", frame)
         cv2.imwrite("frames/" + str(current_frame) + ".jpg", frame)
         current_frame += 1
 
