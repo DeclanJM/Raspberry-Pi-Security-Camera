@@ -13,7 +13,7 @@ def receive_data():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     global CSU_IP_LAPTOP
 
-    server_ip = CSU_IP
+    server_ip = CSU_IP_LAPTOP
     port = 1420
 
     # bind the socket to a specific address and port
