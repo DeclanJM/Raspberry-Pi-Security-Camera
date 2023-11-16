@@ -4,11 +4,15 @@ import laptop
 import webcam as wb
 import time
 
+CSU_IP = "10.84.28.68"
+HOME_IP = "10.0.0.232"
+
 def receive_data():
     # create a socket object
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    global CSU_IP
 
-    server_ip = "10.0.0.232"
+    server_ip = CSU_IP
     port = 1420
 
     # bind the socket to a specific address and port
@@ -47,8 +51,13 @@ def receive_data():
     return max_posts, interval_between_scans
 
 def send_image(filename):
+    global CSU_IP
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect(("10.0.0.232", 1421))
+
+    client_ip = CSU_IP
+    port = 1421
+
+    client.connect((client_ip, port))
 
     file_size = os.path.getsize(filename)
     print(f"Sending: file_size = {file_size} of the image.")

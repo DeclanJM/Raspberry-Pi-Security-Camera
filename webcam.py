@@ -6,6 +6,7 @@ import shutil
 import twitter_bot as tb
 
 SECONDS_TO_RECORD_AFTER_DETECTION = 2
+CAMERA_ID = 0   ##0 is default webcam: 5s startup, 1 is logi: 63s startup
 
 ##Webcam starts recording when it detects a face, then stops after a 3 second period of not seeing one, then calls the get_img function
 def get_vid(number_of_posts):
@@ -13,9 +14,9 @@ def get_vid(number_of_posts):
     timer_started = False
     first_sight = True
     detection_stopped_time = None
-    global SECONDS_TO_RECORD_AFTER_DETECTION
+    global SECONDS_TO_RECORD_AFTER_DETECTION, CAMERA_ID
 
-    vidCap = cv2.VideoCapture(1)   ##0 is default webcam: 5s startup, 1 is logi: 63s startup
+    vidCap = cv2.VideoCapture(CAMERA_ID)   
 
     face_data = cv2.CascadeClassifier(
         cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
@@ -127,7 +128,6 @@ def deleteAll():
     shutil.rmtree(frames_folder, ignore_errors = True)
     shutil.rmtree(video_folder, ignore_errors = True)
 
-
 ##get_vid but for over the network
 def get_vid_net():
     detection = False
@@ -136,7 +136,7 @@ def get_vid_net():
     detection_stopped_time = None
     global SECONDS_TO_RECORD_AFTER_DETECTION
 
-    vidCap = cv2.VideoCapture(1)   ##0 is default webcam: 5s startup, 1 is logi: 63s startup
+    vidCap = cv2.VideoCapture(0)   ##0 is default webcam: 5s startup, 1 is logi: 63s startup
 
     face_data = cv2.CascadeClassifier(
         cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
@@ -192,6 +192,11 @@ def get_vid_net():
             cv2.putText(image, 'INTRUDER!', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
 
         cv2.imshow("Camera", frame)
+        if cv2.waitKey(1) == ord('q'):
+            out.release()
+            vidCap.release()
+            cv2.destroyAllWindows()
+            break
 
 ##get_img but for over the network
 def get_img_net(filename):
@@ -218,5 +223,11 @@ def get_img_net(filename):
             image = cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 0, 255), 3)
             cv2.putText(image, 'INTRUDER!', (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
 
+        cv2.imshow("Video Replay", frame)
         cv2.imwrite("frames/" + str(current_frame) + ".jpg", frame)
         current_frame += 1
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            vid.release()
+            cv2.destroyAllWindows()
+            return

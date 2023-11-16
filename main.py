@@ -3,7 +3,7 @@ import webcam
 import laptop
 import pi
 
-def main_loop():
+def main_local():
     max_posts = int(input("Enter max number of posts:  "))
     interval_between_scans = int(input("Enter amount of time between scans:  "))
     
@@ -25,5 +25,5 @@ def main():
         print("Invalid Option.\nGoodbye!")
 
 if __name__ == "__main__":
-    #main_loop()        ##Runs entire program locally
-    main()              ##Runs program split between pi and laptop
+    #main_local()        ##Runs entire program locally
+    main()            ##Runs program split between pi and laptop

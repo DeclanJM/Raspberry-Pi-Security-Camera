@@ -5,13 +5,16 @@ import twitter_bot as tb
 number_of_posts = 0
 max = 0
 
+CSU_IP = "10.84.199.19"
+HOME_IP = "10.0.0.232"
+
 def send_data(max_posts, interval_between_scans):
-    global max
+    global max, CSU_IP
     max = int(max_posts)
     # create a socket object
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    server_ip = "10.0.0.232"  # replace with the server's IP address
+    server_ip = CSU_IP  # replace with the server's IP address
     server_port = 1420  # replace with the server's port number
 
     # establish connection with server
@@ -47,10 +50,14 @@ def send_data(max_posts, interval_between_scans):
     print("Program completed execution.")
 
 def receive_image():
-    global max_posts, number_of_posts
+    global max_posts, number_of_posts, CSU_IP
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(("10.0.0.232", 1421))
+
+    server_ip = CSU_IP
+    port = 1421
+
+    server.bind((server_ip, port))
     server.listen()
 
     while number_of_posts <= max:
