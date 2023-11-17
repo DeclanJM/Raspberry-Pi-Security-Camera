@@ -16,14 +16,15 @@ def main_local():
         i += 1
 
 def main():
-    machine = input("Which machine are you running on?\nRaspberry Pi or Laptop?\n\t(P or L):  ")
+    machine = input("\nWhich machine are you running on?\n    Raspberry Pi or Laptop\n\t(P or L):  ")
     if machine.lower() == "l":
         laptop.main()
     elif machine.lower() == "p":
         pi.main()
     else:
-        print("Invalid Option.\nGoodbye!")
+        print("Invalid Option.")
+        main()
 
 if __name__ == "__main__":
-    #main_local()        ##Runs entire program locally
-    main()            ##Runs program split between pi and laptop
+    #main_local()        ##Runs entire program locally between two windows
+    main()               ##Runs the program between pi and laptop

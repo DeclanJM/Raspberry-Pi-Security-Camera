@@ -14,7 +14,7 @@ def tweet_text(text):
 def tweet_text_and_media(text, media):
     media_id = load_image(media)
     client.create_tweet(text = text, media_ids = [media_id])
-    print(f"\nSuccessfully Tweeted:\n\n{text}\n\nMedia ID:  {media_id}\n")
+    print(f"\n\tTwitter Bot: Successfully Tweeted!\n\n{text}\n\nMedia ID:  {media_id}\n\n")
 
 ##Requires Basic API Account. Does not work with free version
 ##Tweets initial thread tweet and returns the ID

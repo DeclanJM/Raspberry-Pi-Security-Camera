@@ -5,9 +5,9 @@ import os
 import shutil
 import twitter_bot as tb
 
-SECONDS_TO_RECORD_AFTER_DETECTION = 2
-CAMERA_ID = 0   ##0 is default webcam: 5s startup, 1 is logi: 63s startup
-VIDEO_REPLAY = False
+SECONDS_TO_RECORD_AFTER_DETECTION = 2   ##Amount of time after a face stopped being detected before the camera ends the recording
+CAMERA_ID = 1   ##0 is default webcam: ~5s startup, 1 is usb webcam: ~60s startup
+VIDEO_REPLAY = False    ##True if you want to display the frame-by-frame replay of the footage (Slows program down considerably)
 
 ##Webcam starts recording when it detects a face, then stops after a 3 second period of not seeing one, then calls the get_img function
 def get_vid(number_of_posts):
@@ -129,7 +129,7 @@ def deleteAll():
     shutil.rmtree(frames_folder, ignore_errors = True)
     shutil.rmtree(video_folder, ignore_errors = True)
 
-##get_vid but for over the network
+##get_vid but for over the network, returns the filename 
 def get_vid_net():
     detection = False
     timer_started = False
@@ -163,7 +163,7 @@ def get_vid_net():
         if len(faces) + len(bodies) > 0:
             if detection:
                 if first_sight:
-                    print("\nFace Detected: Recording Started!")
+                    print("\n\tWebcam: Face Detected. Recording Started!")
                     first_sight = False
 
                 timer_started = False
@@ -178,7 +178,7 @@ def get_vid_net():
                     out.release()
                     vidCap.release()
                     cv2.destroyAllWindows()
-                    print("Detection Lost: Stopped Recording!\n")
+                    print("\tWebcam: Detection Lost. Stopped Recording!\n")
                     time.sleep(0.5)
                     return get_img_net(filename)
             else:

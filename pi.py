@@ -2,84 +2,101 @@ import socket
 import datetime
 import twitter_bot as tb
 
+CSU_PI = "10.84.199.19"
+CSU_LAPTOP = "10.84.28.68"
+HOME_IP = "10.0.0.232"
+DENZEL_PI = "172.16.52.120"
+DENZEL_LAPTOP = "172.16.52.119"
+
+CURRENT_LAPTOP = HOME_IP
+LAPTOP_PORT = 1420
+CURRENT_PI = HOME_IP
+PI_PORT = 1421
+
+
 number_of_posts = 0
 max = 0
 
-CSU_IP_PI = "10.84.199.19"
-CSU_IP_LAPTOP = "10.84.28.68"
-HOME_IP = "10.0.0.232"
-DENZEL_PI = "172.16.52.120"
-DENZEL_LAPTOP = "172.16.52.119 "
-
 def send_data(max_posts, interval_between_scans):
-    global max, CSU_IP_LAPTOP, DENZEL_LAPTOP
+    global max
     max = int(max_posts)
-    # create a socket object
+
+    server_ip = CURRENT_LAPTOP
+    server_port = LAPTOP_PORT
+
+    #  Creates a socket object
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    server_ip = DENZEL_LAPTOP #CSU_IP_LAPTOP  # replace with the server's IP address
-    server_port = 1420  # replace with the server's port number
-
-    # establish connection with server
+    #  Establish connection with server
     client.connect((server_ip, server_port))
 
     while True:
-        # input message and send it to the server
+        #  Input message and send it to the server
         client.send(max_posts.encode("utf-8")[:2048])
 
-        # receive message from the server
-        response = client.recv(2048)
-        response = response.decode("utf-8")
+        #  Receive message from the server
+        response = client.recv(2048).decode("utf-8")
 
-        # if server sent us "closed" in the payload, we break out of the loop and close our socket
+        #  If the server responded with "received" then we have successfully sent the max_posts variable
         if response.lower() == "received":
+            print(f"\n\tLaptop: Successfully recieved max_posts = {max_posts}")
             break
         
     while True:
         client.send(interval_between_scans.encode("utf-8")[:2048])
 
-        # receive message from the server
-        response = client.recv(2048)
-        response = response.decode("utf-8")
+        #  Receive message from the server
+        response = client.recv(2048).decode("utf-8")  #  Convert bytes to string
 
-        # if server sent us "closed" in the payload, we break out of the loop and close our socket
+        #  If the server responded with "received" then we have successfully sent the interval_between_scans variable
         if response.lower() == "received":
-            print("Successfully sent data.")
+            print(f"\tLaptop: Successfully recieved interval_between_scans = {interval_between_scans}\n")
+            print("\tPi: Closing connection and waiting to receive image from Laptop...\n")
+            
+            client.close() #  Close client socket (connection to the server)
             receive_image()
             break
 
-    # close client socket (connection to the server)
-    client.close()
-    print("Program completed execution.")
+    print("Program Completed Execution.\n")
 
 def receive_image():
-    global max_posts, number_of_posts, CSU_IP_PI, DENZEL_PI
-
+    ##AF_INET means we are connecting using IP, SOCK_STREAM means we are transmitting using TCP
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    server_ip = DENZEL_PI #CSU_IP_PI
-    port = 1421
+    server_ip = CURRENT_PI
+    port = PI_PORT
 
+    #  Bind the socket to a specific IP and Port and listen for new connections
     server.bind((server_ip, port))
     server.listen()
+    print(f"\tPi: Server Initialized. Listening on {server_ip}:{port}")
 
+    
+
+    #  Receive an image and post it to twitter until number_of_posts == max
     while number_of_posts <= max:
         filename = "image_to_tweet.jpg"
 
+        #  Accept incoming connections
         client_socket, client_address = server.accept()
+        print(f"\tPi: Accepted connection from {client_address[0]}:{client_address[1]}\n")
+        print("Receiving image data now...\n")
 
-        # Receive the size of the file first
+        #  Receive the size of the file first
         file_size = int(client_socket.recv(1024).decode())
+        print(f"\tPi: Received file_size = {file_size} bytes from Laptop @ {client_address}")
 
-        # Send acknowledgment to the client
+        #  Send acknowledgment back to the client
         client_socket.send(b"ACK")
 
-        with open(filename, "wb") as file:
+        print("\tPi: Receiving image chunks 1024 bytes at a time...")
+        with open(filename, "wb") as file:  #  Receive data in chunks of 1024 bytes until the Pi has received the entire image, builds the image from top to bottom
             received_data = 0
             while received_data < file_size:
                 image_chunk = client_socket.recv(1024)
                 received_data += len(image_chunk)
                 file.write(image_chunk)
+        print("\tPi: Image received, posting to Twitter...")
 
         send_tweet(filename)
 
@@ -97,7 +114,6 @@ def send_tweet(filename):
                             filename)
 
 def main():
-    global max_posts
     max_posts = input("Enter max number of posts:  ")
     interval_between_scans = input("Enter amount of time between scans:  ")
 

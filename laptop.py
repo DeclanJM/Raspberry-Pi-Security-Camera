@@ -4,66 +4,68 @@ import laptop
 import webcam as wb
 import time
 
-CSU_IP_PI = "10.84.199.19"
-CSU_IP_LAPTOP = "10.84.28.68"
+CSU_PI = "10.84.199.19"
+CSU_LAPTOP = "10.84.28.68"
 HOME_IP = "10.0.0.232"
 DENZEL_PI = "172.16.52.120"
-DENZEL_LAPTOP = "172.16.52.119 "
+DENZEL_LAPTOP = "172.16.52.119"
+
+CURRENT_LAPTOP = HOME_IP
+LAPTOP_PORT = 1420
+CURRENT_PI = HOME_IP
+PI_PORT = 1421
 
 def receive_data():
-    # create a socket object
+    #  Create a socket object
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    global CSU_IP_LAPTOP, DENZEL_LAPTOP
 
-    server_ip = DENZEL_LAPTOP #CSU_IP_LAPTOP
-    port = 1420
+    server_ip = CURRENT_LAPTOP
+    port = LAPTOP_PORT
 
-    # bind the socket to a specific address and port
+    #  Bind the socket to a specific IP and Port and listen for incoming connections
     server.bind((server_ip, port))
-    # listen for incoming connections
-    server.listen(0)
-    print(f"Listening on {server_ip}:{port}")
+    server.listen()
+    print(f"\n\tLaptop: Server Initialized. Listening on {server_ip}:{port}")
 
-    # accept incoming connections
+    #  Accept incoming connections
     client_socket, client_address = server.accept()
-    print(f"Accepted connection from {client_address[0]}:{client_address[1]}\n")
+    print(f"\tLaptop: Accepted connection from {client_address[0]}:{client_address[1]}\n")
     print("Receiving data now...")
 
-    # receive data from the client
+    #  Receive max_posts from the Pi
     while True:
-        max_posts = client_socket.recv(2048)
-        max_posts = max_posts.decode("utf-8") # convert bytes to string
+        max_posts = client_socket.recv(2048).decode("utf-8")  #  Convert bytes to string
 
         client_socket.send("received".encode("utf-8"))
         break
 
+    #  Receive interval_between_scans from the Pi
     while True:
-        interval_between_scans = client_socket.recv(2048)
-        interval_between_scans = interval_between_scans.decode("utf-8")
+        interval_between_scans = client_socket.recv(2048).decode("utf-8")  #  Convert bytes to string
 
         client_socket.send("received".encode("utf-8"))
         break
 
-    print(f"\nReceived Data:\n\tNumber of Posts:  {max_posts}\n\tInterval between recording sessions: {interval_between_scans}\n")
+    print(f"\n\tLaptop: Received data from Pi:\n\t\tNumber of Posts:  {max_posts}\n\t\tInterval between recording sessions: {interval_between_scans}\n")
 
     # close connection socket with the client
     client_socket.close()
-    print("Finished receiving data from client.\n")
+    print("\tLaptop: Finished receiving data from client.\n")
     # close server socket
     server.close()
     return max_posts, interval_between_scans
 
 def send_image(filename):
-    global CSU_IP_PI, DENZEL_PI
+    global CURRENT_PI
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    client_ip = DENZEL_PI #CSU_IP_PI
-    port = 1421
+    client_ip = CURRENT_PI
+    port = PI_PORT
 
     client.connect((client_ip, port))
 
     file_size = os.path.getsize(filename)
-    print(f"Sending: file_size = {file_size} of the image.")
+    print(f"\tLaptop: Sending: file_size = {file_size} of the image.")
 
     # Send the size of the file first
     client.sendall(str(file_size).encode())
@@ -71,12 +73,12 @@ def send_image(filename):
     # Wait for acknowledgment from the server before sending the file
     acknowledgment = client.recv(1024)
     if acknowledgment == None:
-        print("Error sending file_size to client.")
+        print("ERROR: Unable to send file_size to Pi.")
         return 
     
-    print(f"Client successfully received file_size\n")
+    print(f"\n\tPi: Successfully received file_size\n")
 
-    print(f"Sending: {filename} in chunks to pi.")
+    print(f"\tLaptop: Sending {filename} in chunks of 1024 bytes to the pi.")
     
     with open(filename, 'rb') as file:
         image_data = file.read(1024)
@@ -84,7 +86,7 @@ def send_image(filename):
             client.send(image_data)
             image_data = file.read(1024)
 
-    print("Image sent successfully\n")
+    print("\tLaptop: Image sent successfully.\n")
     client.close()
 
 def main():
@@ -93,8 +95,10 @@ def main():
 
     i = 1
     while i <= int(max):
+        print(f"   Execution cycle : {i} of {max}")
         image = wb.get_vid_net()
         laptop.send_image(image)
+        wb.deleteAll()
         time.sleep(int(interval))
         i += 1
-        wb.deleteAll()
+    print("Program Completed Execution.\n")
