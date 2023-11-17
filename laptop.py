@@ -101,4 +101,4 @@ def main():
         wb.deleteAll()
         time.sleep(int(interval))
         i += 1
-    print("Program Completed Execution.\n")
+    print("\nProgram Completed Execution.\n")
