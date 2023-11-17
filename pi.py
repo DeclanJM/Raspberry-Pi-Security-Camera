@@ -8,14 +8,16 @@ max = 0
 CSU_IP_PI = "10.84.199.19"
 CSU_IP_LAPTOP = "10.84.28.68"
 HOME_IP = "10.0.0.232"
+DENZEL_PI = "172.16.52.120"
+DENZEL_LAPTOP = "172.16.52.119 "
 
 def send_data(max_posts, interval_between_scans):
-    global max, CSU_IP_LAPTOP
+    global max, CSU_IP_LAPTOP, DENZEL_LAPTOP
     max = int(max_posts)
     # create a socket object
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    server_ip = CSU_IP_LAPTOP  # replace with the server's IP address
+    server_ip = DENZEL_LAPTOP #CSU_IP_LAPTOP  # replace with the server's IP address
     server_port = 1420  # replace with the server's port number
 
     # establish connection with server
@@ -51,11 +53,11 @@ def send_data(max_posts, interval_between_scans):
     print("Program completed execution.")
 
 def receive_image():
-    global max_posts, number_of_posts, CSU_IP_PI
+    global max_posts, number_of_posts, CSU_IP_PI, DENZEL_PI
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    server_ip = CSU_IP_PI
+    server_ip = DENZEL_PI #CSU_IP_PI
     port = 1421
 
     server.bind((server_ip, port))

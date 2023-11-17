@@ -7,13 +7,15 @@ import time
 CSU_IP_PI = "10.84.199.19"
 CSU_IP_LAPTOP = "10.84.28.68"
 HOME_IP = "10.0.0.232"
+DENZEL_PI = "172.16.52.120"
+DENZEL_LAPTOP = "172.16.52.119 "
 
 def receive_data():
     # create a socket object
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    global CSU_IP_LAPTOP
+    global CSU_IP_LAPTOP, DENZEL_LAPTOP
 
-    server_ip = CSU_IP_LAPTOP
+    server_ip = DENZEL_LAPTOP #CSU_IP_LAPTOP
     port = 1420
 
     # bind the socket to a specific address and port
@@ -52,10 +54,10 @@ def receive_data():
     return max_posts, interval_between_scans
 
 def send_image(filename):
-    global CSU_IP_PI
+    global CSU_IP_PI, DENZEL_PI
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    client_ip = CSU_IP_PI
+    client_ip = DENZEL_PI #CSU_IP_PI
     port = 1421
 
     client.connect((client_ip, port))
