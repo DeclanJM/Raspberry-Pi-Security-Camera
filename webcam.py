@@ -9,13 +9,14 @@ SECONDS_TO_RECORD_AFTER_DETECTION = 2   ##Amount of time after a face stopped be
 CAMERA_ID = 1   ##0 is default webcam: ~5s startup, 1 is usb webcam: ~60s startup
 VIDEO_REPLAY = False    ##True if you want to display the frame-by-frame replay of the footage (Slows program down considerably)
 
-##Webcam starts recording when it detects a face, then stops after a 3 second period of not seeing one, then calls the get_img function
+##  Webcam starts recording when it detects a face, then stops after a 3 second period of not seeing one, then calls the get_img function
 def get_vid(number_of_posts):
+    global SECONDS_TO_RECORD_AFTER_DETECTION, CAMERA_ID
+
     detection = False
     timer_started = False
     first_sight = True
     detection_stopped_time = None
-    global SECONDS_TO_RECORD_AFTER_DETECTION, CAMERA_ID
 
     vidCap = cv2.VideoCapture(CAMERA_ID)   
 
@@ -23,7 +24,6 @@ def get_vid(number_of_posts):
         cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
     body_data = cv2.CascadeClassifier(
         cv2.data.haarcascades + "haarcascade_fullbody.xml")
-
 
     frame_size = (int(vidCap.get(3)), int(vidCap.get(4)))
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
@@ -52,6 +52,7 @@ def get_vid(number_of_posts):
                 current_time = datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
                 filename = f"video/{current_time}.mp4"
                 out = cv2.VideoWriter(filename, fourcc, 20, frame_size)
+
         elif detection:
             if timer_started:
                 if time.time() - detection_stopped_time >= SECONDS_TO_RECORD_AFTER_DETECTION:
@@ -64,6 +65,7 @@ def get_vid(number_of_posts):
                     get_img(filename, number_of_posts)
                     deleteAll()
                     return
+                
             else:
                 timer_started = True
                 detection_stopped_time = time.time()
@@ -83,13 +85,14 @@ def get_vid(number_of_posts):
             cv2.destroyAllWindows()
             break
 
-##Replays each frame of the video and returns the one in the middle to be posted on twitter
+##  Replays each frame of the video and returns the one in the middle to be posted on twitter
 def get_img(filename, number_of_posts):
+    global SECONDS_TO_RECORD_AFTER_DETECTION, VIDEO_REPLAY
+
     if not os.path.exists("frames"):
         os.makedirs("frames")
     
     vid = cv2.VideoCapture(filename)
-    global SECONDS_TO_RECORD_AFTER_DETECTION, VIDEO_REPLAY
     current_frame = 0
     remove_frame = SECONDS_TO_RECORD_AFTER_DETECTION * 20   #Number of frames after the face stopped being detected
 
@@ -112,32 +115,35 @@ def get_img(filename, number_of_posts):
         for (x, y, width, height) in faces:
             image = cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 0, 255), 3)
             cv2.putText(image, 'INTRUDER!', (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
+
         if VIDEO_REPLAY:
             cv2.imshow("Video Replay", frame)
+
         cv2.imwrite("frames/" + str(current_frame) + ".jpg", frame)
         current_frame += 1
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if cv2.waitKey(1) & 0xFF == ord('q'):   #  'q' is the exit key to end the program
             vid.release()
             cv2.destroyAllWindows()
             return
 
-##Cleans up filesystem so there aren't tens of videos and hundreds of frames
+##  Cleans up filesystem so there aren't tens of videos and hundreds of frames
 def deleteAll():
     video_folder = "./video"
     frames_folder = "./frames"
     shutil.rmtree(frames_folder, ignore_errors = True)
     shutil.rmtree(video_folder, ignore_errors = True)
 
-##get_vid but for over the network, returns the filename 
+##  get_vid but for over the network, returns the filename 
 def get_vid_net():
+    global SECONDS_TO_RECORD_AFTER_DETECTION, CAMERA_ID
+
     detection = False
     timer_started = False
     first_sight = True
     detection_stopped_time = None
-    global SECONDS_TO_RECORD_AFTER_DETECTION
 
-    vidCap = cv2.VideoCapture(0)   ##0 is default webcam: 5s startup, 1 is logi: 63s startup
+    vidCap = cv2.VideoCapture(CAMERA_ID)
 
     face_data = cv2.CascadeClassifier(
         cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
@@ -167,11 +173,13 @@ def get_vid_net():
                     first_sight = False
 
                 timer_started = False
+
             else:
                 detection = True
                 current_time = datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
                 filename = f"video/{current_time}.mp4"
                 out = cv2.VideoWriter(filename, fourcc, 20, frame_size)
+
         elif detection:
             if timer_started:
                 if time.time() - detection_stopped_time >= SECONDS_TO_RECORD_AFTER_DETECTION:
@@ -181,6 +189,7 @@ def get_vid_net():
                     print("\tWebcam: Detection Lost. Stopped Recording!\n")
                     time.sleep(0.5)
                     return get_img_net(filename)
+                
             else:
                 timer_started = True
                 detection_stopped_time = time.time()
@@ -193,21 +202,23 @@ def get_vid_net():
             cv2.putText(image, 'INTRUDER!', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
 
         cv2.imshow("Camera", frame)
+
         if cv2.waitKey(1) == ord('q'):
             out.release()
             vidCap.release()
             cv2.destroyAllWindows()
             break
 
-##get_img but for over the network
+##  get_img but for over the network
 def get_img_net(filename):
+    global SECONDS_TO_RECORD_AFTER_DETECTION, VIDEO_REPLAY
+
     if not os.path.exists("frames"):
         os.makedirs("frames")
     
     vid = cv2.VideoCapture(filename)
-    global SECONDS_TO_RECORD_AFTER_DETECTION, VIDEO_REPLAY
     current_frame = 0
-    remove_frame = SECONDS_TO_RECORD_AFTER_DETECTION * 20   #Number of frames after the face stopped being detected
+    remove_frame = SECONDS_TO_RECORD_AFTER_DETECTION * 20   #  Number of frames after the face stopped being detected
 
     while True:
         success, frame = vid.read()
@@ -223,12 +234,14 @@ def get_img_net(filename):
         for (x, y, width, height) in faces:
             image = cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 0, 255), 3)
             cv2.putText(image, 'INTRUDER!', (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
+
         if VIDEO_REPLAY:
             cv2.imshow("Video Replay", frame)
+
         cv2.imwrite("frames/" + str(current_frame) + ".jpg", frame)
         current_frame += 1
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if cv2.waitKey(1) & 0xFF == ord('q'):   #  'q' is the exit key to end the program
             vid.release()
             cv2.destroyAllWindows()
             return

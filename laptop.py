@@ -4,17 +4,15 @@ import laptop
 import webcam as wb
 import time
 
-CSU_PI = "10.84.199.19"
-CSU_LAPTOP = "10.84.28.68"
-HOME_IP = "10.0.0.232"
-DENZEL_PI = "172.16.52.120"
-DENZEL_LAPTOP = "172.16.52.119"
+HOME_LAPTOP = ""
+HOME_PI = ""
 
-CURRENT_LAPTOP = HOME_IP
+CURRENT_LAPTOP = HOME_LAPTOP
 LAPTOP_PORT = 1420
-CURRENT_PI = HOME_IP
+CURRENT_PI = HOME_PI
 PI_PORT = 1421
 
+## Recieves initial data from Pi in order to create the execution loop
 def receive_data():
     #  Create a socket object
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -55,6 +53,7 @@ def receive_data():
     server.close()
     return max_posts, interval_between_scans
 
+## Sends the image to the pi in chunks
 def send_image(filename):
     global CURRENT_PI
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -89,6 +88,7 @@ def send_image(filename):
     print("\tLaptop: Image sent successfully.\n")
     client.close()
 
+## Main method for laptop
 def main():
     max, interval = laptop.receive_data()
     print("\nExecuting Program...\n")

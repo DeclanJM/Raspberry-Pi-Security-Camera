@@ -3,6 +3,7 @@ import webcam
 import laptop
 import pi
 
+##  Runs entire program in one window locally, does not use sockets at all
 def main_local():
     max_posts = int(input("Enter max number of posts:  "))
     interval_between_scans = int(input("Enter amount of time between scans:  "))
@@ -15,6 +16,7 @@ def main_local():
         time.sleep(interval_between_scans)
         i += 1
 
+## Uses sockets to communicate and run the program between the laptop and raspberry Pi
 def main():
     machine = input("\nWhich machine are you running on?\n    Raspberry Pi or Laptop\n\t(P or L):  ")
     if machine.lower() == "l":

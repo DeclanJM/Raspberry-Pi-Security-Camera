@@ -2,21 +2,18 @@ import socket
 import datetime
 import twitter_bot as tb
 
-CSU_PI = "10.84.199.19"
-CSU_LAPTOP = "10.84.28.68"
-HOME_IP = "10.0.0.232"
-DENZEL_PI = "172.16.52.120"
-DENZEL_LAPTOP = "172.16.52.119"
+HOME_LAPTOP = ""
+HOME_PI = ""
 
-CURRENT_LAPTOP = HOME_IP
+CURRENT_LAPTOP = HOME_LAPTOP
 LAPTOP_PORT = 1420
-CURRENT_PI = HOME_IP
+CURRENT_PI = HOME_PI
 PI_PORT = 1421
-
 
 number_of_posts = 0
 max = 0
 
+##  Joins laptop server, sends max number of posts and the interval between scans over the socket
 def send_data(max_posts, interval_between_scans):
     global max
     max = int(max_posts)
@@ -59,6 +56,7 @@ def send_data(max_posts, interval_between_scans):
 
     print("Program Completed Execution.\n")
 
+##  Creates a new socket, waits for the laptop to join, and then downloads the image in chunks from the laptop
 def receive_image():
     ##AF_INET means we are connecting using IP, SOCK_STREAM means we are transmitting using TCP
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -104,6 +102,7 @@ def receive_image():
             client_socket.close()
             break
 
+##  Sends the new downloaded image file to twitter_bot to be posted
 def send_tweet(filename):
     global number_of_posts
     number_of_posts += 1
@@ -113,11 +112,9 @@ def send_tweet(filename):
                             \nALERT: Intruder #{number_of_posts}!""",
                             filename)
 
+##  Main method for the Raspberry Pi
 def main():
     max_posts = input("Enter max number of posts:  ")
     interval_between_scans = input("Enter amount of time between scans:  ")
 
     send_data(max_posts, interval_between_scans)
-
-if __name__ == "__main__":
-    main()
