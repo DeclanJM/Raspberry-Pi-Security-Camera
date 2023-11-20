@@ -14,3 +14,5 @@
 10. Give the ***laptop input first***, that way it can create the server socket.
 11. Give the ***pi input second***, determining the max number of posts and the time in seconds between posts in which the program will wait.
 12. Let the program run, if you need to crash it, use CTRL+C in the terminal or 'q' on the Camera window.
+
+### If you would like to run this program locally without using sockets, edit the main.py file so that main() is commented out and main_local is not
