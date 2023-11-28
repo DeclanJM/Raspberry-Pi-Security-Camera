@@ -12,9 +12,9 @@ DENZEL_LAPTOP = "172.16.52.119"
 DAD_LAPTOP = "192.168.1.26"
 DAD_PI = "192.168.1.27"
 
-CURRENT_LAPTOP = DAD_LAPTOP
+CURRENT_LAPTOP = HOME_IP
 LAPTOP_PORT = 1420
-CURRENT_PI = DAD_PI
+CURRENT_PI = None
 PI_PORT = 1421
 
 ## Recieves initial data from Pi in order to create the execution loop
@@ -107,3 +107,6 @@ def main():
         time.sleep(int(interval))
         i += 1
     print("\nProgram Completed Execution.\n")
+
+if __name__ == "__main__":
+    main()

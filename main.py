@@ -2,6 +2,7 @@ import time
 import webcam
 import laptop
 import pi
+import gui
 
 ##  Runs entire program in one window locally, does not use sockets at all
 def main_local():
@@ -30,3 +31,4 @@ def main():
 if __name__ == "__main__":
     #main_local()        ##Runs entire program locally between two windows
     main()               ##Runs the program between pi and laptop
+    #gui.main()          ##Runs the program within a GUI

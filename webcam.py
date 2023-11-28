@@ -6,7 +6,7 @@ import shutil
 import twitter_bot as tb
 
 SECONDS_TO_RECORD_AFTER_DETECTION = 2   ##Amount of time after a face stopped being detected before the camera ends the recording
-CAMERA_ID = 1   ##0 is default webcam: ~5s startup, 1 is usb webcam: ~60s startup
+CAMERA_ID = 0   ##0 is default webcam: ~5s startup, 1 is usb webcam: ~60s startup
 VIDEO_REPLAY = False    ##True if you want to display the frame-by-frame replay of the footage (Slows program down considerably)
 
 ##  Webcam starts recording when it detects a face, then stops after a 3 second period of not seeing one, then calls the get_img function

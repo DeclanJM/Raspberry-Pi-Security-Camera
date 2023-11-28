@@ -32,26 +32,23 @@ def send_data(max_posts, interval_between_scans):
     #  Establish connection with server
     client.connect((server_ip, server_port))
 
+    current_var = max_posts
+
     while True:
         #  Input message and send it to the server
-        client.send(max_posts.encode("utf-8")[:2048])
+        client.send(current_var.encode("utf-8")[:2048])
 
         #  Receive message from the server
         response = client.recv(2048).decode("utf-8")
 
         #  If the server responded with "received" then we have successfully sent the max_posts variable
-        if response.lower() == "received":
+        if response.lower() == "received" and current_var == max_posts:
             print(f"\n\tLaptop: Successfully recieved max_posts = {max_posts}")
+            current_var = interval_between_scans
             break
-        
-    while True:
-        client.send(interval_between_scans.encode("utf-8")[:2048])
-
-        #  Receive message from the server
-        response = client.recv(2048).decode("utf-8")  #  Convert bytes to string
 
         #  If the server responded with "received" then we have successfully sent the interval_between_scans variable
-        if response.lower() == "received":
+        if response.lower() == "received" and current_var == interval_between_scans:
             print(f"\tLaptop: Successfully recieved interval_between_scans = {interval_between_scans}\n")
             print("\tPi: Closing connection and waiting to receive image from Laptop...\n")
             
@@ -123,3 +120,6 @@ def main():
     interval_between_scans = input("Enter amount of time between scans:  ")
 
     send_data(max_posts, interval_between_scans)
+
+if __name__ == "__main__":
+    main()
