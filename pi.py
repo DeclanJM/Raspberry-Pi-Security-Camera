@@ -3,16 +3,16 @@ import datetime
 import twitter_bot as tb
 
 CSU_PI = "10.84.199.19"
-CSU_LAPTOP = "10.84.28.68"
+CSU_LAPTOP = "10.84.113.13"
 HOME_IP = "10.0.0.232"
 DENZEL_PI = "172.16.52.120"
 DENZEL_LAPTOP = "172.16.52.119"
 DAD_LAPTOP = "192.168.1.26"
 DAD_PI = "192.168.1.27"
 
-CURRENT_LAPTOP = DAD_LAPTOP
+CURRENT_LAPTOP = CSU_LAPTOP
 LAPTOP_PORT = 1420
-CURRENT_PI = DAD_PI
+CURRENT_PI = CSU_PI
 PI_PORT = 1421
 
 number_of_posts = 0
@@ -45,7 +45,7 @@ def send_data(max_posts, interval_between_scans):
         if response.lower() == "received" and current_var == max_posts:
             print(f"\n\tLaptop: Successfully recieved max_posts = {max_posts}")
             current_var = interval_between_scans
-            break
+            continue
 
         #  If the server responded with "received" then we have successfully sent the interval_between_scans variable
         if response.lower() == "received" and current_var == interval_between_scans:

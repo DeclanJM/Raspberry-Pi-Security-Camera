@@ -29,6 +29,6 @@ def main():
         main()
 
 if __name__ == "__main__":
-    #main_local()        ##Runs entire program locally between two windows
-    main()               ##Runs the program between pi and laptop
+    main_local()        ##Runs entire program locally between two windows
+    #main()               ##Runs the program between pi and laptop
     #gui.main()          ##Runs the program within a GUI
