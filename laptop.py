@@ -5,7 +5,7 @@ import webcam as wb
 import time
 
 CSU_PI = "10.84.199.19"
-CSU_LAPTOP = "10.84.113.13"
+CSU_LAPTOP = "10.84.83.154"
 HOME_IP = "10.0.0.232"
 DENZEL_PI = "172.16.52.120"
 DENZEL_LAPTOP = "172.16.52.119"

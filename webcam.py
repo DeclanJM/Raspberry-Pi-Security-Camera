@@ -71,11 +71,10 @@ def get_vid(number_of_posts):
                 detection_stopped_time = time.time()
 
         if detection:
+            for (x, y, width, height) in faces:
+                image = cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 0, 255), 3)
+                cv2.putText(image, 'INTRUDER!', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
             out.write(frame)
-
-        for (x, y, width, height) in faces:
-            image = cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 0, 255), 3)
-            cv2.putText(image, 'INTRUDER!', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
 
         cv2.imshow("Camera", frame)
 
@@ -93,34 +92,31 @@ def get_img(filename, number_of_posts):
         os.makedirs("frames")
     
     vid = cv2.VideoCapture(filename)
+
+    total_frames = vid.get(cv2.CAP_PROP_FRAME_COUNT) 
+    fps = vid.get(cv2.CAP_PROP_FPS) 
     current_frame = 0
-    remove_frame = SECONDS_TO_RECORD_AFTER_DETECTION * 20   #Number of frames after the face stopped being detected
+    remove_frame = SECONDS_TO_RECORD_AFTER_DETECTION * fps   #Number of frames after the face stopped being detected
+    return_frame = round((total_frames - remove_frame) / 2)
 
     while True:
         success, frame = vid.read()
 
-        if success != True and current_frame > 2:
+        if VIDEO_REPLAY:
+            cv2.imshow("Video Replay", frame)
+
+        if (current_frame == return_frame) and (current_frame > 2):
+            cv2.imwrite("frames/" + str(current_frame) + ".jpg", frame)
             cv2.destroyAllWindows()
             current_time = datetime.datetime.now().strftime("%m/%d/%Y%H:%M:%S")
             tb.tweet_text_and_media(f"""{current_time[0:current_time.find(':') - 2]}
                                     \n{current_time[current_time.find(':') - 2:]}
                                     \nALERT: Intruder #{number_of_posts}!""",
-                                    f"frames/{str(int((current_frame - remove_frame)/2))}.jpg")
+                                    f"frames/{str(return_frame)}.jpg")
             return
 
-        face_data = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = face_data.detectMultiScale(gray, 1.3, 5)
-        
-        for (x, y, width, height) in faces:
-            image = cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 0, 255), 3)
-            cv2.putText(image, 'INTRUDER!', (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
-
-        if VIDEO_REPLAY:
-            cv2.imshow("Video Replay", frame)
-
-        cv2.imwrite("frames/" + str(current_frame) + ".jpg", frame)
-        current_frame += 1
+        else:
+            current_frame += 1
 
         if cv2.waitKey(1) & 0xFF == ord('q'):   #  'q' is the exit key to end the program
             vid.release()
@@ -195,11 +191,10 @@ def get_vid_net():
                 detection_stopped_time = time.time()
 
         if detection:
+            for (x, y, width, height) in faces:
+                image = cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 0, 255), 3)
+                cv2.putText(image, 'INTRUDER!', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
             out.write(frame)
-
-        for (x, y, width, height) in faces:
-            image = cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 0, 255), 3)
-            cv2.putText(image, 'INTRUDER!', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
 
         cv2.imshow("Camera", frame)
 
@@ -217,29 +212,26 @@ def get_img_net(filename):
         os.makedirs("frames")
     
     vid = cv2.VideoCapture(filename)
+
+    total_frames = vid.get(cv2.CAP_PROP_FRAME_COUNT) 
+    fps = vid.get(cv2.CAP_PROP_FPS) 
     current_frame = 0
-    remove_frame = SECONDS_TO_RECORD_AFTER_DETECTION * 20   #  Number of frames after the face stopped being detected
+    remove_frame = SECONDS_TO_RECORD_AFTER_DETECTION * fps   #Number of frames after the face stopped being detected
+    return_frame = round((total_frames - remove_frame) / 2)
 
     while True:
         success, frame = vid.read()
 
-        if success != True and current_frame > 2:
-            cv2.destroyAllWindows()            
-            return f"frames/{str(int((current_frame - remove_frame)/2))}.jpg"
-
-        face_data = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = face_data.detectMultiScale(gray, 1.3, 5)
-        
-        for (x, y, width, height) in faces:
-            image = cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 0, 255), 3)
-            cv2.putText(image, 'INTRUDER!', (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
-
         if VIDEO_REPLAY:
             cv2.imshow("Video Replay", frame)
 
-        cv2.imwrite("frames/" + str(current_frame) + ".jpg", frame)
-        current_frame += 1
+        if (current_frame == return_frame) and (current_frame > 2):
+            cv2.imwrite("frames/" + str(current_frame) + ".jpg", frame)
+            cv2.destroyAllWindows()
+            return f"frames/{str(return_frame)}.jpg"
+
+        else:
+            current_frame += 1
 
         if cv2.waitKey(1) & 0xFF == ord('q'):   #  'q' is the exit key to end the program
             vid.release()
