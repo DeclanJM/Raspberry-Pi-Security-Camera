@@ -32,7 +32,7 @@ def main():
 
 if __name__ == "__main__":
     # Runs both sides of the program locally
-    #main_local()
+    main_local()
 
     # Runs the program between pi and laptop
-    main()
+    #main()
