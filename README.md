@@ -1,4 +1,4 @@
-# CS370 Practical Project: Raspberry Pi - Security Camera - Twitter Bot
+# CS370 Practical Project: Raspberry Pi - Security Camera->Twitter Bot
 
 ## Instructions
 
