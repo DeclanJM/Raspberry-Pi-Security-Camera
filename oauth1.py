@@ -1,6 +1,6 @@
 import tweepy
 
-#Input your API Keys
+# Input your API Keys
 api_key = ''
 api_secret = ''
 bearer_token = r''

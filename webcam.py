@@ -5,11 +5,13 @@ import os
 import shutil
 import twitter_bot as tb
 
-SECONDS_TO_RECORD_AFTER_DETECTION = 2   ##Amount of time after a face stopped being detected before the camera ends the recording
-CAMERA_ID = 0   ##0 is default webcam: ~5s startup, 1 is usb webcam: ~60s startup
-VIDEO_REPLAY = False    ##True if you want to display the frame-by-frame replay of the footage (Slows program down considerably)
 
-##  Webcam starts recording when it detects a face, then stops after a 3 second period of not seeing one, then calls the get_img function
+SECONDS_TO_RECORD_AFTER_DETECTION = 2  # Amount of time after a face stopped being detected before the camera ends the recording
+CAMERA_ID = 0  # 0 is default webcam: ~5s startup, 1 is usb webcam: ~60s startup
+VIDEO_REPLAY = False  #True if you want to display the frame-by-frame replay of the footage (Slows program down considerably)
+
+
+# Webcam starts recording when it detects a face, then stops after a 3 second period of not seeing one, then calls the get_img function
 def get_vid(number_of_posts):
     global SECONDS_TO_RECORD_AFTER_DETECTION, CAMERA_ID
 
@@ -84,7 +86,8 @@ def get_vid(number_of_posts):
             cv2.destroyAllWindows()
             break
 
-##  Replays each frame of the video and returns the one in the middle to be posted on twitter
+
+# Replays each frame of the video and returns the one in the middle to be posted on twitter
 def get_img(filename, number_of_posts):
     global SECONDS_TO_RECORD_AFTER_DETECTION, VIDEO_REPLAY
 
@@ -96,7 +99,7 @@ def get_img(filename, number_of_posts):
     total_frames = vid.get(cv2.CAP_PROP_FRAME_COUNT) 
     fps = vid.get(cv2.CAP_PROP_FPS) 
     current_frame = 0
-    remove_frame = SECONDS_TO_RECORD_AFTER_DETECTION * fps   #Number of frames after the face stopped being detected
+    remove_frame = SECONDS_TO_RECORD_AFTER_DETECTION * fps  # Number of frames after the face stopped being detected
     return_frame = round((total_frames - remove_frame) / 2)
 
     while True:
@@ -118,19 +121,20 @@ def get_img(filename, number_of_posts):
         else:
             current_frame += 1
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):   #  'q' is the exit key to end the program
+        if cv2.waitKey(1) & 0xFF == ord('q'):  # 'q' is the exit key to end the program
             vid.release()
             cv2.destroyAllWindows()
             return
 
-##  Cleans up filesystem so there aren't tens of videos and hundreds of frames
+
+# Cleans up filesystem so there aren't tens of videos and hundreds of frames
 def deleteAll():
     video_folder = "./video"
     frames_folder = "./frames"
     shutil.rmtree(frames_folder, ignore_errors = True)
     shutil.rmtree(video_folder, ignore_errors = True)
 
-##  get_vid but for over the network, returns the filename 
+# get_vid but for over the network, returns the filename 
 def get_vid_net():
     global SECONDS_TO_RECORD_AFTER_DETECTION, CAMERA_ID
 
@@ -204,7 +208,7 @@ def get_vid_net():
             cv2.destroyAllWindows()
             break
 
-##  get_img but for over the network
+# get_img but for over the network
 def get_img_net(filename):
     global SECONDS_TO_RECORD_AFTER_DETECTION, VIDEO_REPLAY
 
@@ -216,7 +220,7 @@ def get_img_net(filename):
     total_frames = vid.get(cv2.CAP_PROP_FRAME_COUNT) 
     fps = vid.get(cv2.CAP_PROP_FPS) 
     current_frame = 0
-    remove_frame = SECONDS_TO_RECORD_AFTER_DETECTION * fps   #Number of frames after the face stopped being detected
+    remove_frame = SECONDS_TO_RECORD_AFTER_DETECTION * fps  # Number of frames after the face stopped being detected
     return_frame = round((total_frames - remove_frame) / 2)
 
     while True:
@@ -233,7 +237,8 @@ def get_img_net(filename):
         else:
             current_frame += 1
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):   #  'q' is the exit key to end the program
+        if cv2.waitKey(1) & 0xFF == ord('q'):  # 'q' is the exit key to end the program
             vid.release()
             cv2.destroyAllWindows()
             return
+        
